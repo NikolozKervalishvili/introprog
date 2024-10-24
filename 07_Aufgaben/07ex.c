@@ -236,7 +236,11 @@ Hinweis: flabble soll als _zweites_ Argument das Ergebnis von fizzledipp erhalte
 Argument die 27. `x` und der fizzledipp von `x` sind unterschiedliche Zahlen!
 */
 int32_t frumpleflabblefizzledipp(int32_t x) {
-	
+  int a = x, b = 27, res;
+
+  fizzledipp(&a);
+  frumple(flabble(&x, &a), &b, &res);
+  return res; 
 }
 
 
@@ -268,9 +272,16 @@ Aufgabe 5b:
 Geben sie zurück, ob die _letzte_ Schicht des gegebenen Pfannkuchenhaufens eine Fruchtschicht ist.
 */
 bool ends_with_fruit(PileOfPancakes p) {
-	PileOfPancakes* cur;
-	for (*cur = p; cur->further_layers != NULL; cur = cur->further_layers);
-    return cur->layer == Fruit;
+  PileOfPancakes *cur = &p;
+  /*
+  Following code doesnt work, cuz *cur gets random address, which may be invalid,
+  so cannot assign p to it:
+
+  PileOfPancakes *cur;
+  for (*cur = p; cur->further_layers != NULL; cur = cur->further_layers);
+  */
+	for (; cur->further_layers != NULL; cur = cur->further_layers);
+  return cur->layer == Fruit;
 }
 
 /*
@@ -279,9 +290,13 @@ Geben Sie zurück, _wie viele_ Fruchtschichten der gegebene Pfannkuchenhaufen en
 */
 int32_t count_fruit_layers(PileOfPancakes p) {
 	int counter = 0;
-	for (PileOfPancakes* cur = p; cur->further_layers != NULL; cur = cur->further_layers) {
-		counter++;
+  PileOfPancakes* cur = &p;
+	for (; cur->further_layers != NULL; cur = cur->further_layers) {
+		if (cur->layer == Fruit) counter++;
 	}
-	counter++;
-    return counter;
+  // because on last layer, next one is NULL,
+  // so for loops cancel and if statement isnt checked
+  // so we check one time again
+	if (cur->layer == Fruit) counter++;
+  return counter;
 }
